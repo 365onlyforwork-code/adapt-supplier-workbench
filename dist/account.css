@@ -1,0 +1,296 @@
+body.account-pending>.sidebar,body.account-pending>.app-shell,body.account-pending>.nav-backdrop,body.account-pending>.skip-link{visibility:hidden;pointer-events:none}
+body.account-pending{background:#162e54}
+.account-loading{position:fixed;inset:46% 16px auto;text-align:center;font-size:13px;color:#d7e7ff;margin:0}
+.account-gate,.account-approvals{box-sizing:border-box;background:#fff;color:#142542;font-family:inherit}
+.account-gate *,.account-approvals *{box-sizing:border-box}
+
+.account-gate{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  height:100dvh;
+  max-width:none;
+  max-height:none;
+  margin:0;
+  padding:0;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  background:#162e54;
+  overflow:auto;
+  overscroll-behavior:contain;
+}
+.account-gate::backdrop{background:#162e54}
+.account-layout{
+  position:relative;
+  isolation:isolate;
+  display:grid;
+  min-height:100%;
+  overflow:hidden;
+  background:radial-gradient(ellipse at 83% 83%,#284e90 0%,transparent 68%),
+    linear-gradient(137deg,#142744 2%,#193967 100%);
+}
+.account-layout-content{
+  display:grid;
+  grid-template-columns:minmax(0,.96fr) minmax(0,1.04fr);
+  align-items:center;
+  gap:clamp(28px,5vw,88px);
+  width:min(100%,1040px);
+  margin-inline:auto;
+  padding:80px clamp(22px,4vw,40px) 112px;
+}
+.account-layout::before,.account-layout::after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  pointer-events:none;
+}
+.account-layout::before{
+  inset:0;
+  background-image:linear-gradient(#a6c2f115 1px,transparent 1px),
+    linear-gradient(90deg,#a6c2f115 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:linear-gradient(145deg,transparent 4%,#000 85%);
+}
+.account-layout::after{
+  top:71%;
+  left:13%;
+  width:min(82%,1060px);
+  aspect-ratio:1;
+  transform:rotate(-29deg);
+  border:1px solid #a6c5ff40;
+  border-radius:24px;
+  outline:1px solid #a6c5ff27;
+  outline-offset:24px;
+}
+.account-brand-pane{min-width:0;color:#fff}
+.account-brand-content{
+  display:grid;
+  gap:clamp(32px,6vh,62px);
+  width:min(100%,435px);
+}
+.account-brand{
+  display:flex;
+  align-items:center;
+  gap:15px;
+  min-width:0;
+}
+.account-brand-mark{
+  position:relative;
+  display:block;
+  width:54px;
+  height:54px;
+  overflow:hidden;
+  border-radius:9px;
+  background:#fff;
+  flex:none;
+}
+.account-brand-mark img{
+  position:absolute;
+  inset:50% auto auto 50%;
+  width:72px;
+  height:72px;
+  max-width:none;
+  transform:translate(-50%,-50%);
+}
+.account-brand-identity{display:grid;min-width:0}
+.account-brand-company{font-size:12px;line-height:1.4;color:#c7daf5}
+.account-brand-wordmark{font-size:clamp(27px,3.6vw,52px);line-height:1.04;font-weight:680;letter-spacing:.085em}
+.account-brand-product{margin-top:4px;font-size:13px;line-height:1.4;color:#e4eeff}
+.account-system-overview h2{
+  margin:0 0 29px;
+  font-size:clamp(29px,4vw,42px);
+  line-height:1.25;
+  font-weight:700;
+  letter-spacing:-.025em;
+  text-wrap:balance;
+}
+html:lang(en) .account-system-overview h2{
+  font-size:clamp(20px,3vw,30px);
+}
+.account-overview-list{margin:0}
+.account-overview-list>div{
+  display:grid;
+  grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr);
+  gap:12px;
+  padding:11px 0;
+  border-top:1px solid #b5d0ff30;
+  font-size:clamp(12px,1.05vw,13px);
+  line-height:1.55;
+}
+.account-overview-list dt{font-weight:600;color:#e0ebfb}
+.account-overview-list dd{margin:0;color:#c1d2ec}
+
+.account-auth-pane{
+  display:flex;
+  justify-content:center;
+  min-width:0;
+}
+.account-auth-content{
+  width:min(100%,446px);
+  padding:clamp(22px,3.3vw,38px);
+  border:1px solid #dce6f6;
+  border-radius:13px;
+  background:#fff;
+  box-shadow:0 22px 64px #06163140;
+}
+.account-auth-heading{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  margin-bottom:26px;
+}
+.account-language{
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  flex:none;
+  min-height:36px;
+  padding:6px 10px;
+  border:1px solid #d8e3f3;
+  border-radius:6px;
+  background:#f8faff;
+  color:#31578f;
+  font-family:inherit;
+  font-size:12px;
+  font-weight:560;
+  line-height:1.4;
+  white-space:nowrap;
+  cursor:pointer;
+}
+.account-language:hover{border-color:#acc3ec;background:#f0f5ff;color:#204fc7}
+.account-auth-heading h1{min-width:0;margin:0;font-size:clamp(28px,3vw,38px);line-height:1.18;font-weight:700;letter-spacing:-.035em;overflow-wrap:break-word}
+.account-intro{font-size:14px;color:#536987;line-height:1.6;margin:-8px 0 22px}
+.account-tabs{
+  display:flex;
+  gap:24px;
+  border-bottom:1px solid #dde5f2;
+  margin-bottom:25px;
+}
+.account-tabs>button{
+  position:relative;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  padding:4px 2px 10px;
+  min-height:42px;
+  color:#536987;
+  font-family:inherit;
+  font-size:14px;
+  font-weight:540;
+  line-height:1.4;
+  cursor:pointer;
+}
+.account-tabs>button:hover,.account-tabs>button[aria-selected=true]{color:#2458d5}
+.account-tabs>button[aria-selected=true]{font-weight:660}
+.account-tabs>button[aria-selected=true]::after{
+  content:"";
+  position:absolute;
+  inset:auto 0 -1px;
+  height:2px;
+  border-radius:2px;
+  background:currentColor;
+}
+.account-form{display:grid;gap:17px}
+.account-field{display:grid;gap:7px;min-width:0}
+.account-field label{font-size:13px;font-weight:590;color:#354967}
+.account-field input{
+  height:48px;
+  min-width:0;
+  width:100%;
+  border:1px solid #cdd8e9;
+  border-radius:7px;
+  background:#fbfcff;
+  padding:10px 13px;
+  color:#142542;
+  font-family:inherit;
+  font-size:15px;
+  outline:none;
+  box-shadow:none;
+}
+.account-field input:hover{border-color:#aabfdf}
+.account-field input:focus{border-color:#2458d5;background:#fff;box-shadow:0 0 0 3px #2458d514}
+.account-field input[aria-invalid=true]{border-color:#b84548}
+.account-field-hint{font-size:12px;line-height:1.45;color:#536987}
+.account-field-error{font-size:12px;line-height:1.45;color:#a12d35}
+.account-submit,.account-button{font-family:inherit;cursor:pointer;border:1px solid transparent;border-radius:6px}
+.account-submit{
+  display:block;
+  width:100%;
+  min-height:48px;
+  margin-top:4px;
+  padding:10px 14px;
+  border-radius:7px;
+  background:#2354d0;
+  color:#fff;
+  font-size:14px;
+  font-weight:660;
+  line-height:1.45;
+}
+.account-submit:hover,.account-button.primary:hover{background:#1c49b6}
+.account-secondary-action{display:block;border:0;background:none;color:#536987;font-family:inherit;font-size:13px;min-height:42px;padding:9px 12px;margin:12px auto 0;cursor:pointer}
+.account-message{margin:0;padding:10px 11px;border-radius:6px;border:1px solid #d5e2f7;background:#f2f7ff;color:#2452a9;font-size:12px;line-height:1.55;overflow-wrap:anywhere;outline:none}
+.account-message.is-error{border-color:#efd6d7;background:#fff5f4;color:#9d323b}
+.account-message[hidden],.account-field-error[hidden]{display:none}
+.account-registration-state{padding:3px 0 21px}
+.account-status-pill{display:inline-block;padding:4px 8px;background:#edf3ff;border:1px solid #d5e3fa;border-radius:4px;color:#2458d5;font-size:12px;font-weight:600}
+.account-registration-state p{margin:13px 0 0;color:#536987;font-size:14px;line-height:1.65}
+.account-checking{color:#536987;font-size:14px;line-height:1.6;margin:0;padding:8px 0 16px}
+.account-gate :focus-visible,.account-approvals :focus-visible{outline:2px solid #2458d5;outline-offset:3px}
+.account-gate input:focus-visible{outline:none}
+.account-gate button:disabled,.account-gate input:disabled,.account-approvals button:disabled{opacity:.55;cursor:default}
+
+.account-approvals::backdrop{background:#e9eff8cc;backdrop-filter:blur(3px)}
+.account-approvals-trigger{margin:0 0 12px}
+.account-approvals{width:min(870px,calc(100vw - 32px));max-height:calc(100dvh - 48px);padding:22px;overflow:auto;border:1px solid #d4deed;border-radius:12px;box-shadow:0 18px 70px #17335b14}
+.account-approvals-heading{display:flex;align-items:center;gap:12px;margin-bottom:17px}
+.account-approvals-heading>div{flex:1;min-width:0}
+.account-approvals-heading h2{font-size:19px;font-weight:670;margin:0;line-height:1.4}
+.account-approvals-heading p{font-size:12px;color:#536987;margin:4px 0 0}
+.account-close{display:grid;place-items:center;flex:none;border:0;border-radius:5px;background:transparent;color:#536987;width:31px;height:31px;padding:0;font:24px/1 system-ui,sans-serif;cursor:pointer}
+.account-close:hover{background:#f0f4fb}
+.account-button{font-size:12px;line-height:1.4;padding:6px 10px;min-height:31px;white-space:nowrap}
+.account-button.secondary{border-color:#d2dded;background:#fff;color:#354967}
+.account-button.primary{background:#2458d5;color:#fff}
+.account-button.reject{background:#fff;border-color:#e2d4d7;color:#a33a43}
+.account-approvals>.account-message:not([hidden]){margin-bottom:13px}
+.account-approval-empty{margin:0;padding:32px 15px;color:#536987;text-align:center;font-size:13px;line-height:1.6;background:#f7f9fd;border:1px solid #e1e8f3;border-radius:7px}
+.account-registrations-scroll{max-height:430px;overflow:auto;border:1px solid #dce5f2;border-radius:7px;scrollbar-width:thin;scrollbar-color:#c0cfe4 transparent}
+.account-registrations-table{width:100%;min-width:690px;border-collapse:separate;border-spacing:0;font-size:12px;font-variant-numeric:tabular-nums;line-height:1.5}
+.account-registrations-table :is(th,td){text-align:left;padding:10px 11px;border-bottom:1px solid #e5ecf6;vertical-align:middle;overflow-wrap:anywhere}
+.account-registrations-table thead th{position:sticky;top:0;z-index:1;background:#f3f7fd;color:#536987;font-weight:600;font-size:11px;white-space:nowrap}
+.account-registrations-table tbody th{font-weight:590;color:#243a59}
+.account-registrations-table tbody tr:last-child>:is(th,td){border-bottom:0}
+.account-registrations-table tbody tr:hover{background:#fafcff}
+.account-registration-time{font-size:11px;color:#536987;white-space:nowrap}
+.account-registration-actions{display:flex;gap:6px;align-items:center}
+@media(max-width:639px){
+  .account-layout-content{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:auto 1fr;
+    align-items:start;
+    gap:24px;
+    width:min(100%,502px);
+    padding:24px clamp(15px,4.5vw,28px) 36px;
+  }
+  .account-layout::before{background-size:28px 28px}
+  .account-layout::after{display:none}
+  .account-brand{gap:11px}
+  .account-system-overview{display:none}
+  .account-brand-mark{width:42px;height:42px;border-radius:6px}
+  .account-brand-mark img{width:56px;height:56px}
+  .account-brand-company{font-size:11px}
+  .account-brand-wordmark{font-size:25px;letter-spacing:.10em}
+  .account-brand-product{display:none}
+  .account-auth-content{padding:23px clamp(18px,5.5vw,30px)}
+  .account-auth-heading{margin-bottom:20px}
+  .account-tabs{margin-bottom:22px}
+  .account-field input{font-size:16px}
+}
+@media(max-width:520px){
+  .account-approvals{width:calc(100vw - 20px);padding:17px 14px;max-height:calc(100dvh - 24px)}
+  .account-approvals-heading{gap:7px}.account-approvals-heading h2{font-size:17px}.account-approvals-heading p{font-size:11px}
+}
+@media print{#account-root,.account-approvals-trigger{display:none!important}}

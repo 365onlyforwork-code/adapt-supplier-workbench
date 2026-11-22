@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2458d5">
+  <meta name="description" content="贝翰战略咨询 ADAPT 采购评估工作台。管理供应商数据，配置评价标准，形成采购评估结果。">
+  <title>贝翰战略咨询 ADAPT 采购评估工作台</title>
+  <link rel="icon" href="./brand/bentham-symbol.jpg?v=brand-3" type="image/jpeg">
+  <link rel="stylesheet" href="./styles.css?v=brand-3">
+  <link rel="stylesheet" href="./workspace.css?v=enterprise-1">
+  <link rel="stylesheet" href="./review.css?v=review-1">
+  <link rel="stylesheet" href="./workbench.css?v=visuals-1">
+  <link rel="stylesheet" href="./analysis-theme.css?v=visuals-1">
+  <link rel="stylesheet" href="./dialog-theme.css?v=i18n-1">
+  <link rel="stylesheet" href="./overview-viz.css?v=visuals-1">
+  <link rel="stylesheet" href="./comparison-viz.css?v=visuals-1">
+  <link rel="stylesheet" href="./account.css?v=login-type-1">
+  <script defer src="./vendor/lucide.min.js"></script>
+  <script defer src="./vendor/xlsx.full.min.js"></script>
+  <script type="module" src="./app.mjs?v=initialize-1"></script>
+</head>
+<body class="account-pending">
+  <div id="account-root"><p class="account-loading" role="status">正在连接…</p></div>
+  <a class="skip-link" href="#main">跳至主内容</a>
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="#overview" id="brand-home" aria-label="返回评估项目">
+      <span class="brand-mark"><img src="./brand/bentham-symbol.jpg" width="52" height="52" alt=""></span>
+      <span class="brand-copy">
+        <span class="brand-company">贝翰战略咨询</span>
+        <strong class="brand-title">ADAPT 采购评估工作台</strong>
+      </span>
+    </a>
+    <nav class="workspace-nav" aria-label="主要导航">
+      <button class="nav-item active" data-view="overview"><i data-lucide="folder-open"></i>评估项目</button>
+      <div class="workspace-label">当前评估</div>
+      <section class="sidebar-project" aria-label="当前项目">
+        <strong id="sidebar-project">尚未打开项目</strong>
+      </section>
+      <button class="nav-item" id="active-assessment"><i data-lucide="list-ordered"></i>评估结果</button>
+      <button class="nav-item" data-view="compare"><i data-lucide="git-compare-arrows"></i>供应商对比<span class="nav-counter hidden" id="unresolved-nav"></span></button>
+      <button class="nav-item" data-view="sensitivity"><i data-lucide="sliders-horizontal"></i>决策偏好</button>
+      <button class="nav-item" data-view="data"><i data-lucide="database"></i>数据管理</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <button class="nav-item" id="help-button"><i data-lucide="circle-help"></i>使用指南</button>
+      <button class="nav-item" id="about-button" type="button" aria-haspopup="dialog"><i data-lucide="info" aria-hidden="true"></i>关于系统</button>
+    </div>
+  </aside>
+  <button class="nav-backdrop hidden" id="nav-backdrop" type="button" aria-label="关闭菜单"></button>
+
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="breadcrumb"><button class="icon-button mobile-menu" id="menu-button" aria-controls="sidebar" aria-expanded="false" aria-label="打开导航"><i data-lucide="menu"></i></button><span id="workspace-name">采购工作区</span><button class="text-button hidden" id="workspace-home" type="button" data-go="overview"><i data-lucide="folder-open" aria-hidden="true"></i>评估项目</button></div>
+      <div class="topbar-actions">
+        <button class="button secondary language-switch" id="language-switch" type="button" aria-label="切换为英文"><i data-lucide="languages" aria-hidden="true"></i><span id="language-switch-label" lang="en">English</span></button>
+        <button class="button secondary" id="workspace-button" type="button" aria-haspopup="dialog"><i data-lucide="user-round"></i><span id="workspace-button-label">工作区</span></button>
+      </div>
+    </header>
+    <main id="main" tabindex="-1">
+      <div class="page-heading">
+        <div><h1 id="page-title" tabindex="-1">评估项目</h1></div>
+        <div class="heading-actions">
+          <div class="export-wrap hidden" id="export-wrap"><button class="button secondary" id="export-button" aria-expanded="false" aria-controls="export-menu"><i data-lucide="download"></i>保存与导出<i data-lucide="chevron-down"></i></button><div class="export-menu hidden" id="export-menu"><button id="save-assessment">保存评估文件</button><button id="export-csv">导出评估结果</button><button id="print-report">打印评估报告</button></div></div>
+          <button class="button primary" id="import-button"><i data-lucide="upload"></i>导入数据</button>
+          <button class="button primary" id="new-assessment"><i data-lucide="plus"></i>新建评估</button>
+        </div>
+      </div>
+      <div class="run-progress hidden" id="run-progress" role="status"><span class="spinner"></span><span id="progress-label">正在生成评估结果</span><progress id="progress-fill" max="100" value="0" aria-label="评估进度"></progress><span id="progress-value">0%</span></div>
+      <div id="run-error" class="inline-error hidden" role="alert"></div>
+      <div class="save-recovery hidden" id="save-recovery"><button class="button primary" id="retry-save" type="button">重试保存</button><button class="button secondary" id="discard-save" type="button">放弃本次修改</button></div>
+      <div class="analysis-toolbar hidden" id="analysis-toolbar"><div class="dataset-title"><i data-lucide="folder-open"></i><strong id="dataset-title"></strong><span class="badge amber hidden" id="dataset-tag">设置待应用</span><span class="badge neutral hidden" id="project-role"></span></div><div class="analysis-meta"><span id="last-updated"></span></div><button class="text-button" id="project-settings" type="button" aria-haspopup="dialog">权限与记录</button></div>
+
+      <section id="projects-view" aria-label="评估项目">
+        <div class="projects-layout">
+          <section class="panel project-register" aria-label="项目列表">
+            <div class="project-list-tabs hidden" id="project-list-tabs" role="group" aria-label="项目列表范围">
+              <button type="button" data-project-list="active" aria-pressed="true">活跃项目</button>
+              <button type="button" data-project-list="inactive" aria-pressed="false">已移出</button>
+              <button type="button" data-project-list="deleted" aria-pressed="false">最近删除</button>
+            </div>
+            <div class="panel-heading project-table-toolbar hidden" id="project-filters">
+              <div class="project-filters"><label class="search-box"><i data-lucide="search"></i><input id="project-search" type="search" placeholder="搜索项目" aria-label="搜索评估项目"></label><label class="sr-only" for="project-filter">评估状态</label><select id="project-filter"><option value="all">全部状态</option><option value="unsubmitted">未提交复核</option><option value="pending">待复核</option><option value="returned">已退回</option><option value="archived">已归档</option><optgroup label="供应商比较"><option value="unresolved">有待确认比较</option><option value="resolved">比较均已明确</option></optgroup></select></div>
+              <span id="project-count" role="status"></span>
+            </div>
+            <p class="project-list-error hidden" id="project-lifecycle-error" role="alert"></p>
+            <div id="empty-workspace" class="project-empty">
+              <span class="route-empty-icon"><i data-lucide="folder-open"></i></span>
+              <div class="project-empty-copy">
+                <h2>还没有评估项目</h2>
+              </div>
+              <div class="route-empty-actions"><button class="button secondary" id="empty-template"><i data-lucide="file-down"></i>下载 Excel 模板</button></div>
+            </div>
+            <div class="table-scroll hidden" id="project-table"><table><thead><tr><th scope="col">项目名称</th><th scope="col">复核状态</th><th scope="col" class="numeric">供应商</th><th scope="col" class="numeric" title="供应商之间待确认的比较组数">待确认</th><th scope="col" class="project-updated">最近更新</th><th scope="col" class="project-row-actions hidden" id="project-action-column"><span class="sr-only">操作</span></th></tr></thead><tbody id="project-rows"></tbody></table></div>
+            <div class="workspace-status hidden" id="project-connection">
+              <span id="project-connection-message" role="status"></span>
+              <button class="button secondary hidden" id="retry-workspace" type="button">重试</button>
+              <button class="button primary hidden" id="workspace-sign-in" type="button">登录</button>
+            </div>
+            <div class="workspace-status hidden" id="migration-banner">
+              <span id="migration-banner-label"></span>
+              <button class="button secondary" id="open-migration" type="button" aria-haspopup="dialog">迁移旧项目</button>
+            </div>
+          </section>
+          <section class="panel activity-panel hidden" id="recent-activity"><div class="panel-heading"><h2>最近活动</h2></div><ol id="activity-list" class="activity-list"></ol></section>
+        </div>
+      </section>
+
+      <section class="view hidden" id="view-overview" aria-label="评估结果">
+        <div id="assessment-empty" class="panel route-empty"><span class="route-empty-icon"><i data-lucide="list-ordered"></i></span><h2>尚未打开评估</h2><button class="button secondary" data-go="overview">查看评估项目</button></div>
+        <div class="result-only hidden assessment-results">
+          <nav class="assessment-actions" aria-label="采购评估操作">
+            <button class="button secondary" type="button" data-extension="eligibility"><i data-lucide="list-filter"></i>准入条件</button>
+            <button class="button secondary" type="button" data-extension="scenarios"><i data-lucide="layers-2"></i>方案对比</button>
+            <button class="button secondary" type="button" data-extension="decision"><i data-lucide="clipboard-check"></i>采购决策</button>
+            <button class="button primary" type="button" data-extension="review" aria-haspopup="dialog"><i data-lucide="file-check-2"></i>复核与归档</button>
+          </nav>
+          <div class="assessment-summary" id="stats-grid"></div>
+          <div class="insight-strip" id="overview-insight"></div>
+          <div class="assessment-evidence">
+            <article class="panel table-panel">
+              <div class="panel-heading"><div class="heading-inline"><h2>供应商排名</h2><span class="count-chip" id="supplier-count"></span></div><div class="project-filters"><label class="search-box"><i data-lucide="search"></i><input id="supplier-search" type="search" placeholder="搜索供应商" aria-label="搜索供应商"></label><select class="hidden" id="eligibility-filter" aria-label="筛选准入状态"><option value="eligible">仅看合格</option><option value="all">全部供应商</option><option value="pending">待核验</option><option value="ineligible">不合格</option></select></div></div>
+              <div class="qualification-strip hidden" id="eligibility-summary"></div>
+              <div class="table-scroll"><table class="results-table"><thead><tr><th scope="col" id="supplier-rank-heading">排名</th><th scope="col">供应商</th><th scope="col" class="hidden" id="eligibility-column">准入状态</th><th scope="col" class="numeric">综合评分（分）</th><th scope="col" class="numeric">排名稳定性</th><th scope="col">操作</th></tr></thead><tbody id="results-body"></tbody></table></div>
+            </article>
+            <article class="panel performance-panel">
+              <div class="panel-heading">
+                <h2>评分分布</h2>
+                <div class="segmented" id="method-toggle" aria-label="评估方式">
+                  <button class="active" data-method="wsm" aria-pressed="true">综合评分</button>
+                  <button data-method="topsis" aria-pressed="false">理想匹配</button>
+                  <button data-method="vikor" aria-pressed="false">折中排序</button>
+                </div>
+              </div>
+              <div id="performance-chart"></div>
+            </article>
+            <article class="panel rank-panel">
+              <div class="panel-heading">
+                <div><h2>名次分布</h2><p>综合评分在权重变化下的名次分布</p></div>
+              </div>
+              <div id="rank-chart"></div>
+            </article>
+          </div>
+          <article class="panel" id="decision-panel" tabindex="-1" aria-label="采购决策"></article>
+          <article class="panel decision-print hidden" id="decision-print" aria-label="采购决策记录"></article>
+        </div>
+      </section>
+
+      <section class="view hidden" id="view-compare" aria-label="供应商对比">
+        <article class="panel route-empty no-result-only" id="compare-empty">
+          <span class="route-empty-icon"><i data-lucide="git-compare-arrows"></i></span>
+          <h2>尚未打开评估</h2>
+          <div class="route-empty-actions">
+            <button class="button secondary" data-go="overview">查看评估项目</button>
+          </div>
+        </article>
+
+        <article class="panel compare-toolbar result-only hidden" aria-label="选择比较对象">
+          <div class="pair-selectors">
+            <label><span class="pair-select-label">供应商 A <span id="pair-eligibility-a" class="hidden"></span></span><select id="pair-a" aria-label="供应商 A"></select></label>
+            <button class="swap-button" id="swap-pair" aria-label="交换供应商"><i data-lucide="arrow-left-right"></i></button>
+            <label><span class="pair-select-label">供应商 B <span id="pair-eligibility-b" class="hidden"></span></span><select id="pair-b" aria-label="供应商 B"></select></label>
+          </div>
+        </article>
+
+        <div class="compare-layout result-only hidden">
+          <article class="panel compare-main">
+            <div class="panel-heading"><div><h2>评分差异</h2><p>A − B（分）</p></div><span id="pair-status" class="badge amber">需确认偏好</span></div>
+            <div class="pair-metrics" id="pair-metrics"></div>
+            <div id="pair-chart"></div>
+            <div class="decision-summary">
+              <div class="pair-conclusion" id="pair-conclusion"></div>
+              <button class="text-button" data-go="sensitivity">调整评价重点</button>
+            </div>
+          </article>
+
+          <aside class="panel tolerance-panel" aria-label="比较标准">
+            <div class="panel-heading"><h2>比较标准</h2></div>
+            <label class="slider-label" for="delta-slider">可接受差异（分）<strong id="delta-display">—</strong></label>
+            <input id="delta-slider" type="range" min="0" max="0.1" step="any" value="0.01">
+            <label class="slider-label space-top" for="p-slider">情景覆盖比例<strong id="p-display">90%</strong></label>
+            <input id="p-slider" type="range" min="0.75" max="0.99" step="0.01" value="0.9">
+            <div class="range-labels"><span>75%</span><span>99%</span></div>
+            <button class="button secondary full-width" id="reset-tolerance"><i data-lucide="rotate-ccw"></i>恢复默认标准</button>
+          </aside>
+        </div>
+
+        <article class="panel pair-drivers-panel result-only hidden">
+          <div class="panel-heading"><h2>指标贡献</h2><span class="small-label">正值有利于 A</span></div>
+          <div id="pair-drivers" class="table-scroll" aria-label="指标对评分差异的贡献"></div>
+        </article>
+
+        <details class="panel matrix-panel result-only hidden">
+          <summary class="panel-heading"><div><h2>全部供应商对照</h2><p>行供应商领先列供应商的情景占比</p></div><i class="section-chevron" data-lucide="chevron-down" aria-hidden="true"></i></summary>
+          <div id="pair-matrix" class="table-scroll"></div>
+        </details>
+      </section>
+
+      <section class="view hidden" id="view-sensitivity" aria-label="决策偏好">
+        <article class="panel route-empty no-result-only" id="sensitivity-empty">
+          <span class="route-empty-icon"><i data-lucide="sliders-horizontal"></i></span>
+          <h2>尚未打开评估</h2>
+          <div class="route-empty-actions">
+            <button class="button secondary" data-go="overview">查看评估项目</button>
+          </div>
+        </article>
+
+        <nav class="feature-tabs result-only hidden" aria-label="决策偏好页面">
+          <button class="active" type="button" id="weights-tab" aria-pressed="true" aria-controls="weight-view">权重设置</button>
+          <button type="button" id="scenarios-tab" aria-pressed="false" aria-controls="scenario-panel">方案对比</button>
+        </nav>
+        <div class="sensitivity-layout result-only hidden" id="weight-view">
+          <article class="panel weights-panel">
+            <div class="panel-heading"><h2>指标权重</h2><button class="icon-button" id="reset-weights" aria-label="恢复已应用设置" title="恢复已应用设置"><i data-lucide="rotate-ccw"></i></button></div>
+            <div id="weight-controls"></div>
+            <div class="settings-apply-row">
+              <button class="button primary full-width" id="apply-weights"><i data-lucide="refresh-cw"></i>更新评估</button>
+            </div>
+          </article>
+
+          <article class="panel scan-panel">
+            <div class="panel-heading"><div><h2>优先顺序变化</h2><p id="scan-pair-label"></p></div><select id="scan-criterion" aria-label="选择调整指标"></select></div>
+            <div class="scan-summary" id="scan-summary"></div>
+            <div id="scan-chart"></div>
+            <p class="analysis-caption">调整所选指标时，其余指标按当前比例联动。</p>
+            <div class="scan-action" id="scan-action"></div>
+            <div class="scan-next-action"><button class="text-button" data-go="compare">更换对比供应商</button></div>
+          </article>
+        </div>
+        <div class="result-only hidden" id="scenario-panel" tabindex="-1"></div>
+      </section>
+
+<section class="view hidden" id="view-data" aria-label="数据管理">
+  <article class="panel data-records-panel" aria-labelledby="data-records-title">
+    <div class="panel-heading">
+      <div class="data-source-copy">
+        <h2 id="data-records-title">供应商资料</h2>
+        <div class="data-source-info result-only hidden"><i data-lucide="file-spreadsheet" aria-hidden="true"></i><span id="data-source-label"></span><span id="data-count"></span></div>
+      </div>
+      <div class="data-source-actions">
+        <button class="button secondary" id="template-xlsx" type="button"><i data-lucide="file-down"></i>下载模板</button>
+        <button class="button primary" id="data-import-button" type="button"><i data-lucide="upload"></i>导入数据</button>
+      </div>
+    </div>
+    <div id="data-table" class="table-scroll result-only hidden"></div>
+    <div class="data-empty no-result-only" id="data-empty">
+      <i data-lucide="table-2" aria-hidden="true"></i>
+      <p>尚未导入供应商数据</p>
+    </div>
+  </article>
+
+  <details class="panel result-only hidden" id="eligibility-panel">
+    <summary class="panel-heading"><h2>准入条件</h2><i class="section-chevron" data-lucide="chevron-down" aria-hidden="true"></i></summary>
+    <div id="eligibility-editor"></div>
+  </details>
+
+  <article class="panel data-config-panel result-only hidden" id="data-settings-panel" aria-labelledby="data-config-title">
+    <div class="panel-heading">
+      <h2 id="data-config-title">评价标准</h2>
+      <div class="config-actions">
+        <span class="dirty-indicator hidden" id="settings-dirty" role="status">设置待应用</span>
+        <label class="advanced-toggle"><input type="checkbox" id="show-advanced" aria-controls="config-table">显示浮动范围</label>
+        <button class="button primary" id="apply-data-settings" type="button">应用设置</button>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table class="config-table" id="config-table">
+        <thead>
+          <tr><th scope="col">评价指标</th><th scope="col">评价方向</th><th scope="col">最低重要程度</th><th scope="col">重要程度</th><th scope="col">最高重要程度</th></tr>
+        </thead>
+        <tbody id="criteria-body"></tbody>
+      </table>
+    </div>
+    <div class="form-error" id="criteria-error" role="alert"></div>
+  </article>
+</section>
+    </main>
+  </div>
+
+<dialog id="import-dialog" class="import-dialog" aria-labelledby="import-dialog-title">
+  <div class="dialog-header">
+    <div>
+      <h2 id="import-dialog-title">新建供应商评估</h2>
+    </div>
+    <button class="icon-button" id="close-import" type="button" aria-label="关闭导入"><i data-lucide="x"></i></button>
+  </div>
+
+  <div class="import-steps" aria-label="导入流程">
+    <span class="active" id="upload-step" aria-current="step">选择文件</span>
+    <span class="step-line" aria-hidden="true"></span>
+    <span id="preview-step">核对数据与标准</span>
+  </div>
+
+  <label class="assessment-name-label" for="assessment-name">评估名称
+    <input id="assessment-name" type="text" maxlength="80" autocomplete="off" autofocus>
+  </label>
+
+  <div id="upload-stage">
+    <label class="drop-zone" id="drop-zone" for="file-input">
+      <span class="drop-icon" aria-hidden="true"><i data-lucide="upload-cloud"></i></span>
+      <strong>拖入文件，或点击选择</strong>
+      <span>支持 Excel、CSV、TSV 和已保存的评估文件，最大 5 MB</span>
+      <input type="file" id="file-input" accept=".xlsx,.csv,.tsv,.json" class="sr-only" aria-label="选择供应商数据文件">
+    </label>
+    <div class="template-row">
+      <button class="text-button" id="dialog-template" type="button"><i data-lucide="file-down"></i>下载模板</button>
+    </div>
+  </div>
+
+  <div id="preview-stage" class="hidden">
+    <div class="file-card import-file-strip">
+      <i data-lucide="file-spreadsheet" aria-hidden="true"></i>
+      <div><strong id="import-filename" tabindex="-1"></strong><span id="import-size"></span></div>
+      <button class="text-button" id="choose-another" type="button">更换文件</button>
+    </div>
+
+    <div id="import-validation" class="import-validation hidden" role="status" aria-live="polite" aria-atomic="true">
+      <i data-lucide="info" aria-hidden="true"></i>
+      <div>
+        <strong id="import-validation-title">等待数据校验</strong>
+        <p id="import-validation-detail"></p>
+        <ul id="import-validation-errors" class="hidden"></ul>
+      </div>
+    </div>
+
+    <div class="mapping-row">
+      <label for="name-column">供应商名称列<select id="name-column"></select></label>
+    </div>
+    <h3 class="import-mapping-label" id="import-mapping-label">参评指标</h3>
+    <div class="column-picks" id="column-picks" role="group" aria-labelledby="import-mapping-label"></div>
+
+    <div class="import-section-heading"><h3>数据预览</h3><span class="small-label" id="import-preview-count"></span></div>
+    <div id="import-preview" class="table-scroll" aria-label="导入数据预览"></div>
+
+    <div class="import-standard-heading">
+      <strong>评价标准</strong>
+    </div>
+    <div class="table-scroll">
+      <table class="import-settings-table" aria-label="导入指标的评价标准">
+        <thead><tr><th scope="col">评价指标</th><th scope="col">评价方向</th><th scope="col">重要程度</th></tr></thead>
+        <tbody id="import-criteria"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="form-error" id="import-error" role="alert"></div>
+  <div class="dialog-footer">
+    <button class="button secondary" id="cancel-import" type="button">取消</button>
+    <button class="button primary hidden" id="confirm-import" type="button" disabled><i data-lucide="chart-no-axes-combined"></i>开始评估</button>
+  </div>
+</dialog>
+
+<dialog id="help-dialog" class="help-dialog" aria-labelledby="help-dialog-title">
+  <div class="dialog-header">
+    <div><h2 id="help-dialog-title">工作台使用指南</h2></div>
+    <button class="icon-button" id="close-help" type="button" aria-label="关闭使用指南"><i data-lucide="x"></i></button>
+  </div>
+  <div class="help-content">
+    <h3>开始评估</h3>
+    <ol>
+      <li>导入供应商数据，核对公司名称与评价指标。</li>
+      <li>确认每项指标的评价方向，设置相对重要程度。</li>
+      <li>设置准入条件，核对合格、待核验和不合格的供应商。</li>
+      <li>保存不同权重方案，比较入围供应商的排名与评分。</li>
+      <li>记录采购决策和后续事项，保存或导出评估。</li>
+    </ol>
+
+    <h3>阅读结果</h3>
+    <dl>
+      <dt>综合评分</dt><dd>按各项指标的重要程度汇总表现，以百分制显示。</dd>
+      <dt>排名稳定性</dt><dd>评价重点变化时保持当前名次的比例。排名稳定不代表表现领先。</dd>
+      <dt>优势明确</dt><dd>当前比较支持明确的优先顺序。</dd>
+      <dt>差异可接受</dt><dd>评分差异处于你设置的接受范围内，可结合其他采购条件选择。</dd>
+      <dt>需确认偏好</dt><dd>当前设置不足以明确判断，需要进一步确定关键指标的优先级。</dd>
+    </dl>
+
+    <h3>保存与继续</h3>
+    <p>在“保存与导出”中下载评估文件。下次导入该文件，即可恢复数据和设置；也可以导出评估结果或打印报告。</p>
+
+    <details class="method-details">
+      <summary>数据填写要求</summary>
+      <ul>
+        <li>支持 2–30 家供应商、2–10 项评价指标，公司名称不能重复。</li>
+        <li>每个指标均填写大于零的数值，同一列使用一致单位。</li>
+        <li>Excel 中的公式请先粘贴为数值；缺失数据需补全后导入。</li>
+        <li>采购单价通常越低越好，合格率通常越高越好；导入后请逐项确认。</li>
+      </ul>
+    </details>
+    <details class="method-details">
+      <summary>计算依据</summary>
+      <p>综合评分采用 WSM；理想匹配采用 TOPSIS；折中排序采用 VIKOR。排名分析在设置的指标重要程度范围内比较 200,000 组情景。</p>
+      <p>排名稳定性和优势占比基于这些评价情景，不代表真实履约成功率。情景覆盖比例决定评分差异范围的宽度。</p>
+    </details>
+  </div>
+</dialog>
+
+  <div id="toast" class="toast hidden" role="status"></div>
+  <dialog id="about-dialog" class="about-dialog" aria-labelledby="about-dialog-title">
+    <div class="dialog-header">
+      <div><h2 id="about-dialog-title">关于系统</h2><p lang="en">About ADAPT</p></div>
+      <button class="icon-button" id="close-about" type="button" aria-label="关闭关于系统"><i data-lucide="x" aria-hidden="true"></i></button>
+    </div>
+    <div class="about-content">
+      <div class="about-brand">
+        <span class="brand-mark"><img src="./brand/bentham-symbol.jpg" width="52" height="52" alt=""></span>
+        <div>
+          <strong>贝翰战略咨询 ADAPT 采购评估工作台</strong>
+          <p>让战略铿锵落地，让管理说到就到</p>
+        </div>
+      </div>
+      <dl class="about-details">
+        <div><dt>创作者</dt><dd class="about-creator" lang="en">Yanbing Min</dd></div>
+        <div><dt>公司</dt><dd data-language-original lang="zh-CN">翱勤（深圳）科技有限公司</dd></div>
+        <div><dt>统一社会信用代码</dt><dd class="about-code">91440300MA5G80GW88</dd></div>
+        <div><dt>成立日期</dt><dd><time datetime="2020-06-09">2020 年 6 月 9 日</time></dd></div>
+        <div><dt>公司地址</dt><dd data-language-original lang="zh-CN">深圳市南山区招商街道沿山社区南海大道1079号花园城数码大厦<wbr>A座201-CR156</dd></div>
+        <div><dt>联系邮箱</dt><dd><a class="about-contact" href="mailto:minyanbing@bentham.com.cn">minyanbing@bentham.com.cn</a></dd></div>
+        <div><dt>微信公众号</dt><dd data-language-original lang="zh-CN">贝翰战略咨询</dd></div>
+        <div><dt>系统版本</dt><dd>1.0.0</dd></div>
+      </dl>
+    </div>
+  </dialog>
+
+  <dialog id="workspace-dialog" class="workspace-dialog" aria-label="工作区">
+    <button class="icon-button workspace-dialog-close" id="close-workspace" type="button" aria-label="关闭工作区"><i data-lucide="x"></i></button>
+    <button class="button secondary account-approvals-trigger hidden" id="account-approvals-button" type="button" aria-haspopup="dialog">注册审批</button>
+    <div id="workspace-content"></div>
+  </dialog>
+  <dialog id="review-dialog" class="review-dialog" aria-labelledby="review-title">
+    <div class="dialog-header">
+      <h2 id="review-title">复核与归档</h2>
+      <button id="close-review" class="icon-button" type="button" aria-label="关闭复核与归档"><i data-lucide="x" aria-hidden="true"></i></button>
+    </div>
+    <div id="review-content" class="review-content"></div>
+  </dialog>
+  <div id="project-row-menu" class="project-row-menu hidden" role="menu" aria-label="项目操作"></div>
+  <dialog id="project-delete-dialog" class="project-delete-dialog" aria-labelledby="project-delete-title" aria-describedby="project-delete-note">
+    <div class="dialog-header"><h2 id="project-delete-title">删除评估项目</h2></div>
+    <div class="project-delete-content">
+      <p id="project-delete-note">可在「最近删除」中恢复。</p>
+      <p class="project-list-error hidden" id="project-delete-error" role="alert"></p>
+    </div>
+    <div class="dialog-footer">
+      <button type="button" class="button secondary" id="cancel-project-delete" autofocus>取消</button>
+      <button type="button" class="button destructive" id="confirm-project-delete">删除项目</button>
+    </div>
+  </dialog>
+  <div id="review-print-output"></div>
+</body>
+</html>
