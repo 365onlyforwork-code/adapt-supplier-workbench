@@ -1,0 +1,15 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+/data/
+/.data/
+/node_modules/
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+*.log
+*.adapt.json
